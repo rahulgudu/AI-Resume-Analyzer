@@ -169,7 +169,6 @@
 
 // export default Upload;
 
-
 import { prepareInstructions } from "constants";
 import React, { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
@@ -209,76 +208,66 @@ const Upload = () => {
       setStatusText("Uploading resume...");
 
       /* ---------------- Upload PDF ---------------- */
-      const uploadedResume = await fs.upload([file]);
-      if (!uploadedResume) throw new Error("Failed to upload resume");
+      const uploadedFile = await fs.upload([file]);
+      if (!uploadedFile) throw new Error("Failed to upload resume");
 
       /* ---------------- Convert to Image ---------------- */
       setStatusText("Converting resume to image...");
       const imageFile = await convertPdfToImage(file);
-      if (!imageFile.file)
-        throw new Error("Failed to convert PDF to image");
+      if (!imageFile.file) throw new Error("Failed to convert PDF to image");
 
       /* ---------------- Upload Image ---------------- */
       setStatusText("Uploading preview image...");
       const uploadedImage = await fs.upload([imageFile.file]);
-      if (!uploadedImage)
-        throw new Error("Failed to upload image");
+      if (!uploadedImage) throw new Error("Failed to upload image");
 
       /* ---------------- Save Initial Resume Data ---------------- */
-      setStatusText("Preparing analysis...");
+      setStatusText("Preparing data...");
       const uuid = generateUUID();
 
-      const baseData = {
+      const data = {
         id: uuid,
+        resumePath: uploadedFile.path,
+        imagePath: uploadedImage.path,
         companyName,
         jobTitle,
         jobDescription,
-        assets: {
-          filePath: uploadedResume.path,
-          previewImage: uploadedImage.path,
-        },
-        feedback: null as Feedback | null,
-        createdAt: new Date().toISOString(),
+        feedback: "",
       };
 
-      await kv.set(`resume:${uuid}`, JSON.stringify(baseData));
+      await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
       /* ---------------- AI Feedback ---------------- */
       setStatusText("Analyzing resume...");
-      const aiResponse = await ai.feedback(
-        uploadedResume.path,
+      const feedback = await ai.feedback(
+        uploadedFile.path,
         prepareInstructions({ jobTitle, jobDescription }),
       );
 
-      if (!aiResponse)
-        throw new Error("AI failed to analyze resume");
+      if (!feedback) throw new Error("AI failed to analyze resume");
 
-      const rawText =
-        typeof aiResponse.message.content === "string"
-          ? aiResponse.message.content
-          : aiResponse.message.content[0].text;
+      const feedbackText =
+        typeof feedback.message.content === "string"
+          ? feedback.message.content
+          : feedback.message.content[0].text;
 
       /* ---------------- Safe JSON Parse ---------------- */
       let parsed;
       try {
-        parsed = JSON5.parse(rawText); // handles trailing commas, etc.
+        parsed = JSON.parse(feedbackText); // handles trailing commas, etc.
       } catch {
-        parsed = JSON.parse(rawText);
+        parsed = JSON.parse(feedbackText);
       }
 
       console.log(parsed);
-      
 
       /* ---------------- Normalize to Universal Feedback ---------------- */
       const normalizedFeedback: Feedback = normalizeFeedback(parsed);
 
       /* ---------------- Save Final Data ---------------- */
-      const finalData = {
-        ...baseData,
-        feedback: normalizedFeedback,
-      };
+      data.feedback = normalizedFeedback;
 
-      await kv.set(`resume:${uuid}`, JSON.stringify(finalData));
+      await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
       setStatusText("Analysis complete. Redirecting...");
       navigate(`/resume/${uuid}`);
@@ -329,13 +318,13 @@ const Upload = () => {
           ) : (
             <>
               <h2 className="text-gray-600 text-center mt-4">
-                Drop your resume for an ATS score and personalized improvement tips
+                Drop your resume for an ATS score and personalized improvement
+                tips
               </h2>
 
               <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-6 mt-10 bg-white p-8 rounded-2xl shadow-md"
-              >
+                className="flex flex-col gap-6 mt-10 bg-white p-8 rounded-2xl shadow-md">
                 <div className="form-div">
                   <label htmlFor="company-name">Company Name</label>
                   <input
@@ -373,8 +362,7 @@ const Upload = () => {
 
                 <button
                   className="primary-button py-3 rounded-xl font-semibold"
-                  type="submit"
-                >
+                  type="submit">
                   Analyze Resume
                 </button>
               </form>

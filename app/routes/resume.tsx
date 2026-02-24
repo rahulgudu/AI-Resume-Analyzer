@@ -147,9 +147,11 @@ const Resume = () => {
         if (!stored) return;
 
         const data = JSON.parse(stored);
+        console.log("resume data", data);
+        
 
         /* ---------- Load Resume PDF ---------- */
-        const resumeBlob = await fs.read(data.assets.filePath);
+        const resumeBlob = await fs.read(data.resumePath);
         if (resumeBlob) {
           const pdfBlob = new Blob([resumeBlob], {
             type: "application/pdf",
@@ -159,7 +161,7 @@ const Resume = () => {
         }
 
         /* ---------- Load Preview Image ---------- */
-        const imageBlob = await fs.read(data.assets.previewImage);
+        const imageBlob = await fs.read(data.imagePath);
         if (imageBlob) {
           const imgUrl = URL.createObjectURL(imageBlob);
           setImageUrl(imgUrl);

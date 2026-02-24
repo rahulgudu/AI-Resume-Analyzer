@@ -55,12 +55,11 @@
 //   overallRecommendation: string;
 // }
 
-
 /* ============================================================
    Job Types
 ============================================================ */
 
- type JobType =
+type JobType =
   | "technical"
   | "marketing"
   | "sales"
@@ -70,7 +69,7 @@
   | "operations"
   | "other";
 
- type EmploymentType =
+type EmploymentType =
   | "Full-time"
   | "Part-time"
   | "Contract"
@@ -81,7 +80,7 @@
    Job Interface
 ============================================================ */
 
- interface Job {
+interface Job {
   id: string;
   title: string;
   department?: string;
@@ -104,7 +103,7 @@
    Feedback Section (Dynamic + Role-Agnostic)
 ============================================================ */
 
- interface FeedbackSection {
+interface FeedbackSection {
   id: string; // unique key: "experience", "leadership", etc.
   title: string; // UI display name
   score: number; // 0–100
@@ -117,7 +116,7 @@
    Main Feedback Model (Universal)
 ============================================================ */
 
- interface Feedback {
+interface Feedback {
   overallScore: number;
 
   jobMatch: {
@@ -153,7 +152,7 @@ interface Resume {
     previewImage: string;
     filePath: string;
   };
-
+  imagePath: string;
   feedback: Feedback;
 
   createdAt?: string;
