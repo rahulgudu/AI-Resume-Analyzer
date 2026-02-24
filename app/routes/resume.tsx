@@ -108,8 +108,8 @@ import Summary from "~/components/Summary";
 import { usePuterStore } from "~/lib/puter";
 
 export const meta = () => [
-  { title: "Resumind | Review" },
-  { name: "description", content: "Detailed Overview" },
+  { title: "Resumemate | Review" },
+  { name: "description", content: "Review your resume" },
 ];
 
 const Resume = () => {

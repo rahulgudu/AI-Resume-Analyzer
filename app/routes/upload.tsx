@@ -179,6 +179,10 @@ import { convertPdfToImage } from "~/lib/pdfToImage";
 import { usePuterStore } from "~/lib/puter";
 import { generateUUID } from "~/lib/utils";
 import JSON5 from "json5";
+export const meta = () => [
+  { title: "Resumate | Upload" },
+  { name: "description", content: "Upload your resume" },
+];
 
 const Upload = () => {
   const { fs, ai, kv } = usePuterStore();

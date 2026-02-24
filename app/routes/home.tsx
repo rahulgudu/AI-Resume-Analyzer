@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Resumind" },
+    { title: "Resumate" },
     { name: "description", content: "Smart feedback for your dream job" },
   ];
 }
@@ -89,11 +89,21 @@ export default function Home() {
         )}
 
         {!loadingResumes && resumes?.length > 0 && (
-          <div className="resumes-section">
-            {resumes?.map((resume: any) => (
-              <ResumeCard key={resume.id} resume={resume} />
-            ))}
-          </div>
+          <>
+            <div className="flex justify-end mb-6 px-4">
+              <button
+                onClick={() => navigate("/wipe")}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition">
+                Wipe All Resumes
+              </button>
+            </div>
+
+            <div className="resumes-section">
+              {resumes?.map((resume: any) => (
+                <ResumeCard key={resume.id} resume={resume} />
+              ))}
+            </div>
+          </>
         )}
 
         {!loadingResumes && resumes?.length === 0 && (

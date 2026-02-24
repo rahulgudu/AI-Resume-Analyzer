@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { usePuterStore } from "~/lib/puter";
 export const meta = () => [
-  { title: "Resumind | Auth" },
+  { title: "Resumemate | Auth" },
   { name: "description", content: "Log into your account" },
 ];
 const Auth = () => {
